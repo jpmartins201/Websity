@@ -1,3 +1,6 @@
+using System;
+using Microsoft.Data.SqlClient;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +18,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+SqlConnection Connection = new SqlConnection();
 
 var summaries = new[]
 {

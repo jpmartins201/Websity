@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj": {}
+    "c:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj": {
+    "c:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj",
+        "projectUniqueName": "c:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj",
         "projectName": "Websity",
-        "projectPath": "C:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj",
+        "projectPath": "c:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\Websity.csproj",
         "packagesPath": "C:\\Users\\Websis\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\obj\\",
+        "outputPath": "c:\\Users\\Websis\\Documents\\DotnetProjects\\Websity\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Websis\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -43,6 +43,14 @@
             "Dapper": {
               "target": "Package",
               "version": "[2.0.123, )"
+            },
+            "Dapper.Contrib": {
+              "target": "Package",
+              "version": "[2.0.78, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[3.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
