@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<GetConnection>(sp => async () => {
-    var connection = new SqlConnection("Data Source=usinacompany.com;User ID=usina_usrmentoria;Password=Abc12345;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+    var connection = new SqlConnection();
     await connection.OpenAsync();
     return connection;
 });
