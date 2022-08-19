@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<GetConnection>(sp => async () => {
-    var connection = new SqlConnection("Data Source=usinacompany.com;User ID=usina_usrmentoria;Password=Abc12345;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+    var connection = new SqlConnection("+");
     await connection.OpenAsync();
     return connection;
 });
@@ -30,11 +30,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
 
 app.MapGet("/alunos", async (GetConnection connectionGetter) =>
 {
@@ -70,19 +65,40 @@ app.MapPut("/alunos", async (GetConnection connectionGetter, Aluno aluno) => {
     var id = con.Update<Aluno>(aluno);
 });
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/categorias", async (GetConnection connectionGetter) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    var con = await connectionGetter();
+    return con.GetAll<Categoria>().ToList();
+});
+
+app.MapGet("/categorias/{id}", async (GetConnection connectionGetter, Guid id) =>
+{
+    var con = await connectionGetter();
+    return con.Get<Categoria>(id);
+});
+
+app.MapDelete("/categorias/{id}", async (GetConnection connectionGetter, Guid id) => {
+    try {
+        var con = await connectionGetter();
+        con.Delete<Categoria>(new Categoria(id));
+        return Results.Ok("Excluído com sucesso");
+    }
+    catch (Exception e) {
+        return Results.Problem("Erro durante a exclusão: " + e);
+    }
+});
+
+app.MapPost("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
+    var con = await connectionGetter();
+    var id = con.Insert<Categoria>(categoria);
+    return Results.Created($"/alunos/{id}", categoria);
+});
+
+app.MapPut("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
+    var con = await connectionGetter();
+    var id = con.Update<Categoria>(categoria);
+});
+
 
 app.Run();
 
