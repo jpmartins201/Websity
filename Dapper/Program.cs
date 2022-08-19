@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<GetConnection>(sp => async () => {
-    var connection = new SqlConnection("+");
+    var connection = new SqlConnection("");
     await connection.OpenAsync();
     return connection;
 });
