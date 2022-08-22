@@ -91,12 +91,82 @@ app.MapDelete("/categorias/{id}", async (GetConnection connectionGetter, Guid id
 app.MapPost("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
     var con = await connectionGetter();
     var id = con.Insert<Categoria>(categoria);
-    return Results.Created($"/alunos/{id}", categoria);
+    return Results.Created($"/autor/{id}", categoria);
 });
 
 app.MapPut("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
     var con = await connectionGetter();
     var id = con.Update<Categoria>(categoria);
+});
+
+app.MapGet("/autors", async (GetConnection connectionGetter) =>
+{
+    var con = await connectionGetter();
+    return con.GetAll<Autor>().ToList();
+});
+
+app.MapGet("/autors/{id}", async (GetConnection connectionGetter, Guid id) =>
+{
+    var con = await connectionGetter();
+    return con.Get<Autor>(id);
+});
+
+app.MapDelete("/autor/{id}", async (GetConnection connectionGetter, Guid id) => {
+    try {
+        var con = await connectionGetter();
+        con.Delete<Autor>(new Autor(id));
+        return Results.Ok("Excluído com sucesso");
+    }
+    catch (Exception e) {
+        return Results.Problem("Erro durante a exclusão: " + e);
+    }
+});
+
+app.MapPost("/autors", async (GetConnection connectionGetter, Autor autor) => {
+    var con = await connectionGetter();
+    var id = con.Insert<Autor>(autor);
+    return Results.Created($"/autor/{id}", autor);
+});
+
+app.MapPut("/autor", async (GetConnection connectionGetter, Autor autor) => {
+    var con = await connectionGetter();
+    var id = con.Update<Autor>(autor);
+});
+
+
+app.MapGet("/cursos", async (GetConnection connectionGetter) =>
+{
+    var con = await connectionGetter();
+    return con.GetAll<Curso>().ToList();
+});
+
+app.MapGet("/cursos/{id}", async (GetConnection connectionGetter, Guid id) =>
+{
+    var con = await connectionGetter();
+    return con.Get<Curso>(id);
+});
+
+app.MapDelete("/cursos/{id}", async (GetConnection connectionGetter, Guid id) => {
+    try {
+        var con = await connectionGetter();
+        con.Execute("DELETE FROM AlunoCurso WHERE CoursoId = @id");
+        con.Delete<Curso>(new Curso(id));
+        return Results.Ok("Excluído com sucesso");
+    }
+    catch (Exception e) {
+        return Results.Problem("Erro durante a exclusão: " + e);
+    }
+});
+
+app.MapPost("/cursos", async (GetConnection connectionGetter, Curso curso) => {
+    var con = await connectionGetter();
+    var id = con.Insert<Curso>(curso);
+    return Results.Created($"/curso/{id}", curso);
+});
+
+app.MapPut("/cursos", async (GetConnection connectionGetter, Curso curso) => {
+    var con = await connectionGetter();
+    var id = con.Update<Curso>(curso);
 });
 
 

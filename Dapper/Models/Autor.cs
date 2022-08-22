@@ -7,6 +7,7 @@ namespace Websity.Models
     [Table("[Autor]")]
     public class Autor
     {
+        public Autor(Guid id) {}
         public Guid Id { get; set; }
         public string Nome { get; set; }
         public string Bio { get; set; }

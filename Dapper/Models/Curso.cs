@@ -7,6 +7,8 @@ namespace Websity.Models
     [Table("[Curso]")]
     public class Curso
     {
+        public Curso(Guid id) {}
+        public Curso(Guid id, Guid AutorId, Guid CategoriaId) {}
         public Curso() => Categorias = new List<Categoria>();
 
         [Key]
