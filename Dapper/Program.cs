@@ -169,6 +169,41 @@ app.MapPut("/cursos", async (GetConnection connectionGetter, Curso curso) => {
     var id = con.Update<Curso>(curso);
 });
 
+// ALUNO-CURSO
+app.MapGet("/classes", async (GetConnection connectionGetter) =>
+{
+    var con = await connectionGetter();
+    return con.GetAll<AlunoCurso>().ToList();
+});
+
+app.MapGet("/classes/{cursoId}/", async (GetConnection connectionGetter, Guid id) =>
+{
+    var con = await connectionGetter();
+    return con.Get<AlunoCurso>(id);
+});
+
+app.MapDelete("/classes/{id}", async (GetConnection connectionGetter, Guid id) => {
+    try {
+        var con = await connectionGetter();
+        con.Execute("DELETE FROM AlunoCurso WHERE CoursoId = @id");
+        return Results.Ok("Excluído com sucesso");
+    }
+    catch (Exception e) {
+        return Results.Problem("Erro durante a exclusão: " + e);
+    }
+});
+
+app.MapPost("/classes/{id}", async (GetConnection connectionGetter, Guid id, AlunoCurso matricula) => {
+    var con = await connectionGetter();
+    var class_id = con.Insert<AlunoCurso>(matricula);
+    return Results.Created($"/classes/{id}", matricula);
+});
+
+app.MapPut("/classes", async (GetConnection connectionGetter, AlunoCurso matricula) => {
+    var con = await connectionGetter();
+    var id = con.Update<AlunoCurso>(matricula);
+});
+
 
 app.Run();
 
