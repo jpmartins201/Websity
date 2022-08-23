@@ -6,6 +6,7 @@ namespace Websity.Models
     [Table("[AlunoCurso]")]
     public class AlunoCurso
     {
+        public AlunoCurso(){}
         public AlunoCurso(Guid CoursoId, Guid AlunoId){}
         [Key]
         public Guid CoursoId { get; set; }

@@ -46,8 +46,8 @@ app.MapGet("/alunos/{id}", async (GetConnection connectionGetter, Guid id) =>
 app.MapDelete("/alunos/{id}", async (GetConnection connectionGetter, Guid id) => {
     try {
         var con = await connectionGetter();
-        con.Delete<Aluno>(new Aluno(id));
-        return Results.Ok("Excluído com sucesso");
+        var deleted = await con.ExecuteAsync("DELETE FROM Aluno WHERE Id = @id", new {Id = id.ToString()});
+        return Results.Ok();
     } 
     catch (Exception e) {
         return Results.Problem("Erro durante a exclusão: " + e);
@@ -56,19 +56,22 @@ app.MapDelete("/alunos/{id}", async (GetConnection connectionGetter, Guid id) =>
 
 app.MapPost("/alunos", async (GetConnection connectionGetter, Aluno aluno) => {
     var con = await connectionGetter();
-    var id = con.Insert<Aluno>(aluno);
+    var id = con.Execute("INSERT INTO Aluno (Id, Nome, Email, Cpf) VALUES (@Id, @Nome, @Email, @Cpf)", aluno);
     return Results.Created($"/alunos/{id}", aluno);
 });
 
 app.MapPut("/alunos", async (GetConnection connectionGetter, Aluno aluno) => {
     var con = await connectionGetter();
-    var id = con.Update<Aluno>(aluno);
+    var id = con.Execute("UPDATE Aluno SET Nome=@Nome, Email=@Email, Cpf=@Cpf WHERE AlunoId = @Id", aluno);
+    return Results.Created($"/alunos/{id}", aluno);
+    // var id = con.Update<Aluno>(aluno);
 });
 
 app.MapGet("/categorias", async (GetConnection connectionGetter) =>
 {
     var con = await connectionGetter();
-    return con.GetAll<Categoria>().ToList();
+    var result = con.GetAll<Categoria>();
+    return Results.Ok(result);
 });
 
 app.MapGet("/categorias/{id}", async (GetConnection connectionGetter, Guid id) =>
@@ -77,26 +80,29 @@ app.MapGet("/categorias/{id}", async (GetConnection connectionGetter, Guid id) =
     return con.Get<Categoria>(id);
 });
 
+app.MapPost("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
+    var con = await connectionGetter();
+    // var id = con.Insert<Categoria>(categoria);
+    var id = con.Execute("INSERT INTO Categoria VALUES (@Id, @Titulo, @Descricao)", categoria);
+    return Results.Created($"/categorias/{id}", categoria);
+});
+
+app.MapPut("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
+    var con = await connectionGetter();
+    var id = con.Execute("UPDATE Categoria SET Titulo = @Titulo, Descricao = @Descricao WHERE Id = @Id", categoria);
+    return Results.Ok();
+    // var id = con.Update<Categoria>(categoria);
+});
+
 app.MapDelete("/categorias/{id}", async (GetConnection connectionGetter, Guid id) => {
     try {
         var con = await connectionGetter();
-        con.Delete<Categoria>(new Categoria(id));
+        var _ = con.ExecuteAsync("DELETE FROM Categoria WHERE Id = @Id", new {Id = id.ToString()});
         return Results.Ok("Excluído com sucesso");
     }
     catch (Exception e) {
         return Results.Problem("Erro durante a exclusão: " + e);
     }
-});
-
-app.MapPost("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
-    var con = await connectionGetter();
-    var id = con.Insert<Categoria>(categoria);
-    return Results.Created($"/autor/{id}", categoria);
-});
-
-app.MapPut("/categorias", async (GetConnection connectionGetter, Categoria categoria) => {
-    var con = await connectionGetter();
-    var id = con.Update<Categoria>(categoria);
 });
 
 app.MapGet("/autors", async (GetConnection connectionGetter) =>
@@ -193,10 +199,11 @@ app.MapDelete("/classes/{id}", async (GetConnection connectionGetter, Guid id) =
     }
 });
 
-app.MapPost("/classes/{id}", async (GetConnection connectionGetter, Guid id, AlunoCurso matricula) => {
+app.MapPost("/classes", async (GetConnection connectionGetter, AlunoCurso matricula) => {
     var con = await connectionGetter();
+    Console.Write(matricula.CoursoId);
     var class_id = con.Insert<AlunoCurso>(matricula);
-    return Results.Created($"/classes/{id}", matricula);
+    return Results.Created($"/classes/{class_id}", matricula);
 });
 
 app.MapPut("/classes", async (GetConnection connectionGetter, AlunoCurso matricula) => {
