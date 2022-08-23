@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<GetConnection>(sp => async () => {
-    var connection = new SqlConnection("");
+    var connection = new SqlConnection("Data Source=usinacompany.com;User ID=usina_usrmentoria;Password=Abc12345;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
     await connection.OpenAsync();
     return connection;
 });
@@ -120,7 +120,7 @@ app.MapGet("/autors/{id}", async (GetConnection connectionGetter, Guid id) =>
 app.MapDelete("/autor/{id}", async (GetConnection connectionGetter, Guid id) => {
     try {
         var con = await connectionGetter();
-        con.Delete<Autor>(new Autor(id));
+        var _ = con.ExecuteAsync("DELETE FROM Autor WHERE Id = @Id", new {Id = id.ToString()});
         return Results.Ok("Excluído com sucesso");
     }
     catch (Exception e) {
@@ -130,13 +130,16 @@ app.MapDelete("/autor/{id}", async (GetConnection connectionGetter, Guid id) => 
 
 app.MapPost("/autors", async (GetConnection connectionGetter, Autor autor) => {
     var con = await connectionGetter();
-    var id = con.Insert<Autor>(autor);
+    // var id = con.Insert<Autor>(autor);
+    var id = con.Execute("INSERT INTO Autor VALUES (@Id, @Nome, @Bio, @Email)", autor);
     return Results.Created($"/autor/{id}", autor);
 });
 
 app.MapPut("/autor", async (GetConnection connectionGetter, Autor autor) => {
     var con = await connectionGetter();
-    var id = con.Update<Autor>(autor);
+    // var id = con.Update<Autor>(autor);
+    var id = con.Execute("UPDATE Autor SET Nome = @Nome, Bio = @Bio, Email = @Email WHERE Id = @Id", autor);
+    return Results.Ok();
 });
 
 
@@ -166,13 +169,24 @@ app.MapDelete("/cursos/{id}", async (GetConnection connectionGetter, Guid id) =>
 
 app.MapPost("/cursos", async (GetConnection connectionGetter, Curso curso) => {
     var con = await connectionGetter();
-    var id = con.Insert<Curso>(curso);
+    // var id = con.Insert<Curso>(curso);
+    var id = con.Execute("INSERT INTO Curso VALUES (@Id, @Titulo, @Descricao, @DuracaoEmMinutos, @DataUltimaAtualizacao, @AutorId, @CategoriaId)", curso);
     return Results.Created($"/curso/{id}", curso);
 });
 
 app.MapPut("/cursos", async (GetConnection connectionGetter, Curso curso) => {
     var con = await connectionGetter();
-    var id = con.Update<Curso>(curso);
+    // var id = con.Update<Curso>(curso);
+    var sql = @"
+    UPDATE Curso SET 
+        Titulo = @Titulo, 
+        Descricao = @Descricao, 
+        DuracaoEmMinutos = @DuracaoEmMinutos, 
+        DataUltimaAtualizacao = @DataUltimaAtualizacao, 
+        AutorId = @AutorId, 
+        CategoriaId = @CategoriaId";
+    var id = con.Execute(sql, curso);
+    return Results.Ok();
 });
 
 // ALUNO-CURSO
@@ -182,9 +196,10 @@ app.MapGet("/classes", async (GetConnection connectionGetter) =>
     return con.GetAll<AlunoCurso>().ToList();
 });
 
-app.MapGet("/classes/{cursoId}/", async (GetConnection connectionGetter, Guid id) =>
+app.MapGet("/classes/{id}/", async (GetConnection connectionGetter, Guid id) =>
 {
     var con = await connectionGetter();
+    // var result = con.Execute("SELECT CoursoId, AlunoId, Progresso, DataInicio, UltimaDataAtualizacao From AlunoCurso WHERE CoursoId = @Id", new {Id = id.ToString()});
     return con.Get<AlunoCurso>(id);
 });
 
@@ -201,22 +216,23 @@ app.MapDelete("/classes/{id}", async (GetConnection connectionGetter, Guid id) =
 
 app.MapPost("/classes", async (GetConnection connectionGetter, AlunoCurso matricula) => {
     var con = await connectionGetter();
-    Console.Write(matricula.CoursoId);
-    var class_id = con.Insert<AlunoCurso>(matricula);
+    // var class_id = con.Insert<AlunoCurso>(matricula);
+    var class_id = con.Execute("INSERT INTO AlunoCurso (CoursoId, AlunoId, Progresso, DataInicio) VALUES (@CoursoId, @AlunoId, @Progresso, @DataInicio)", matricula);
     return Results.Created($"/classes/{class_id}", matricula);
 });
 
 app.MapPut("/classes", async (GetConnection connectionGetter, AlunoCurso matricula) => {
     var con = await connectionGetter();
-    var id = con.Update<AlunoCurso>(matricula);
+    // var id = con.Update<AlunoCurso>(matricula);
+    var sql = @"UPDATE AlunoCurso SET 
+            CoursoId = @CoursoId, 
+            AlunoId = @AlunoId, 
+            Progresso = @Progresso, 
+            DataInicio = @DataInicio";
+    var id = con.Execute(sql, matricula);
+    return Results.Created($"/classes/{id}", matricula);
 });
 
 
 app.Run();
-
-record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
 public delegate Task<IDbConnection> GetConnection();
